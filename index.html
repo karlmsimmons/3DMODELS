@@ -41,12 +41,14 @@
 
         var scene, camera, renderer, controls;
         var loader = new GLTFLoader();
-        var model;
+        var model; // To store the loaded model
+        var boundingBox = new THREE.Box3(); // For calculating the model's bounding box
+        var size = new THREE.Vector3(); // To store the size of the model
 
         // Initialize the scene
         scene = new THREE.Scene();
 
-        // Set up camera (make sure it's in a good position to view the model)
+        // Set up camera
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 1, 5);
 
@@ -61,7 +63,7 @@
         // Add OrbitControls to allow interaction with the 3D model
         controls = new OrbitControls(camera, renderer.domElement);
 
-        // Add "photobooth-style" lighting
+        // Add lighting to the scene
         var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
         keyLight.position.set(5, 5, 5);
         scene.add(keyLight);
@@ -79,6 +81,12 @@
             model = gltf.scene;
             model.position.set(0, 0, 0);
             scene.add(model);
+
+            // Calculate bounding box after the model is added to the scene
+            boundingBox.setFromObject(model);
+            size.copy(boundingBox.getSize(new THREE.Vector3()));
+
+            // Start the rendering loop after the model is loaded
             render();
         }, function(xhr) {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -105,9 +113,12 @@
 
         // Function to re-center the model in the window
         function centerModel() {
-            camera.position.set(0, 1, 5);
-            camera.lookAt(0, 0, 0);
+            // Reset camera position
+            camera.position.set(0, 1, size.length() * 1.5); // Position the camera based on model size
+            camera.lookAt(0, 0, 0); // Make the camera look at the model's center
             controls.update();
+
+            // Optionally, adjust the camera's field of view or other settings
             controls.reset();
         }
 
@@ -116,5 +127,6 @@
 
     <!-- Center Button at the bottom right -->
     <button id="centerButton">Center Model</button>
+
 </body>
 </html>
