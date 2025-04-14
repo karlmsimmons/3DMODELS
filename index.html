@@ -86,7 +86,7 @@
             boundingBox.setFromObject(model);
             size.copy(boundingBox.getSize(new THREE.Vector3()));
 
-            // After loading the model, adjust the camera to fit it into the viewer
+            // Adjust camera to fit the model into the window
             adjustCameraToFitModel();
 
             // Start the rendering loop after the model is loaded
@@ -130,19 +130,15 @@
             var distance = Math.max(size.x, size.y, size.z);
             var fov = camera.fov * (Math.PI / 180);  // Convert fov to radians
             var cameraZ = Math.abs(distance / (2 * Math.tan(fov / 2))) * 1.5; // Set the camera distance
-
-            // Adjust the camera position based on the model's size
             camera.position.z = cameraZ;
+
+            // Adjust the camera's near and far planes
+            camera.near = cameraZ / 2;
+            camera.far = cameraZ * 2;
+            camera.updateProjectionMatrix();
+
             camera.lookAt(0, 0, 0); // Ensure the camera is looking at the center of the model
             controls.update();
-
-            // Adjust field of view to accommodate the model and ensure it fills the window
-            var aspectRatio = window.innerWidth / window.innerHeight;
-            var scaleFactor = Math.max(size.x / window.innerWidth, size.y / window.innerHeight);
-
-            // Optionally adjust the camera's field of view or other settings to ensure proper fitting
-            camera.fov = Math.atan(size.y / cameraZ) * 2 * (180 / Math.PI); // Dynamically adjust FOV
-            camera.updateProjectionMatrix();
         }
 
         render();
