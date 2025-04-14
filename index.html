@@ -15,13 +15,13 @@
         }
         #centerButton {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
+            bottom: 5%; /* 5% from the bottom of the iframe container */
+            right: 5%;  /* 5% from the right of the iframe container */
+            padding: 1vh 2vw; /* Make button size responsive */
             background-color: black;
             color: white;
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 20px;
+            font-size: 2vw; /* Make the button font size responsive */
             border: none;
             border-radius: 25px;
             cursor: pointer;
@@ -112,8 +112,13 @@
             camera.updateProjectionMatrix();
         });
 
-        // Add event listener to the center button
-        document.getElementById("centerButton").addEventListener("click", centerModel);
+        // Add event listener to receive messages from the parent window (iframe control)
+        window.addEventListener('message', function(event) {
+            if (event.data === 'centerModel') {
+                // Trigger model centering when the parent sends the message
+                centerModel();
+            }
+        });
 
         // Function to re-center the model and adjust the camera to fit the model in the viewer
         function centerModel() {
@@ -144,9 +149,6 @@
 
         render();
     </script>
-
-    <!-- Center Button at the bottom right -->
-    <button id="centerButton">Center Model</button>
 
 </body>
 </html>
