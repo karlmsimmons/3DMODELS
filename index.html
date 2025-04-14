@@ -12,6 +12,24 @@
         canvas {
             display: block;
         }
+        #centerButton {
+            position: absolute;
+            bottom: 5%; /* 5% from the bottom of the iframe container */
+            right: 5%;  /* 5% from the right of the iframe container */
+            padding: 1vh 2vw; /* Make button size responsive */
+            background-color: black;
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2vw; /* Make the button font size responsive */
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #centerButton:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 <body>
@@ -31,12 +49,12 @@
 
         // Create the renderer with transparent background
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha: true enables transparency
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(400, 300); // Set fixed size of 400x300
         renderer.setClearColor(0x000000, 0);  // Transparent background
         document.body.appendChild(renderer.domElement);
 
         // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 10000);  // Adjust near and far clipping planes
+        camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.001, 10000);  // Adjust near and far clipping planes
         camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -85,8 +103,8 @@
 
         // Resize handling for responsive design
         window.addEventListener('resize', function() {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
+            renderer.setSize(400, 300);
+            camera.aspect = 400 / 300;
             camera.updateProjectionMatrix();
         });
 
@@ -104,6 +122,20 @@
 
             camera.lookAt(0, 0, 0); // Ensure the camera is looking at the center of the model
             controls.update();
+        }
+
+        // Send message to parent window when the button is clicked (iframe sends 'centerModel' message)
+        window.addEventListener('message', function(event) {
+            if (event.data === 'centerModel') {
+                centerModel();
+            }
+        });
+
+        // Function to center the model
+        function centerModel() {
+            boundingBox.setFromObject(model);
+            size.copy(boundingBox.getSize(new THREE.Vector3()));
+            adjustCameraToFitModel();
         }
 
         render();
