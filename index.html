@@ -79,14 +79,15 @@
         // Load the GLB model from GitHub Pages
         loader.load('https://karlmsimmons.github.io/3DMODELS/assets/rose.glb', function(gltf) {
             model = gltf.scene;
-            model.position.set(0, 0, 0);
+            model.position.set(0, 0, 0); // Ensure it's at the center of the scene
+            model.scale.set(1, 1, 1); // Make sure the model is not scaled unexpectedly
             scene.add(model);
 
-            // Calculate the model's bounding box
+            // Calculate the model's bounding box after it's added to the scene
             boundingBox.setFromObject(model);
             size.copy(boundingBox.getSize(new THREE.Vector3()));
 
-            // Adjust camera to fit the model into the window
+            // After loading the model, adjust the camera to fit it into the viewer
             adjustCameraToFitModel();
 
             // Start the rendering loop after the model is loaded
