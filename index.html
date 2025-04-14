@@ -8,16 +8,15 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: white; /* Ensure the page has a white background */
+            background-color: white;
         }
         canvas {
             display: block;
         }
-        /* Button Styles */
         #centerButton {
             position: absolute;
-            bottom: 20px; /* Position it at the bottom */
-            right: 20px; /* Position it at the right */
+            bottom: 20px;
+            right: 20px;
             padding: 10px 20px;
             background-color: black;
             color: white;
@@ -32,7 +31,7 @@
             background-color: #333;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet"> <!-- Load IBM Plex Mono font -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 </head>
 <body>
     <script type="module">
@@ -42,7 +41,7 @@
 
         var scene, camera, renderer, controls;
         var loader = new GLTFLoader();
-        var model; // To store the loaded model
+        var model;
 
         // Initialize the scene
         scene = new THREE.Scene();
@@ -51,12 +50,12 @@
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 1, 5);
 
-        // Create the renderer
-        renderer = new THREE.WebGLRenderer();
+        // Create the renderer with anti-aliasing enabled
+        renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Set the clear color of the renderer to white to ensure the background is white
+        // Set the clear color of the renderer to white
         renderer.setClearColor(0xffffff, 1);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -106,12 +105,9 @@
 
         // Function to re-center the model in the window
         function centerModel() {
-            // Reset camera position
             camera.position.set(0, 1, 5);
             camera.lookAt(0, 0, 0);
             controls.update();
-
-            // Optionally, adjust the camera's field of view or other settings if you want the model to fill the window more
             controls.reset();
         }
 
@@ -120,6 +116,5 @@
 
     <!-- Center Button at the bottom right -->
     <button id="centerButton">Center Model</button>
-
 </body>
 </html>
