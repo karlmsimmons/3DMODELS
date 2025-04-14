@@ -8,30 +8,11 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: white;
         }
         canvas {
             display: block;
         }
-        #centerButton {
-            position: absolute;
-            bottom: 5%; /* 5% from the bottom of the iframe container */
-            right: 5%;  /* 5% from the right of the iframe container */
-            padding: 1vh 2vw; /* Make button size responsive */
-            background-color: black;
-            color: white;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 2vw; /* Make the button font size responsive */
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        #centerButton:hover {
-            background-color: #333;
-        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 </head>
 <body>
     <script type="module">
@@ -41,24 +22,22 @@
 
         var scene, camera, renderer, controls;
         var loader = new GLTFLoader();
-        var model; // To store the loaded model
-        var boundingBox = new THREE.Box3(); // For calculating the model's bounding box
-        var size = new THREE.Vector3(); // To store the size of the model
+        var model;
+        var boundingBox = new THREE.Box3();
+        var size = new THREE.Vector3();
 
         // Initialize the scene
         scene = new THREE.Scene();
 
-        // Set up camera (make sure it's in a good position to view the model)
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1, 5);
-
-        // Create the renderer with anti-aliasing enabled
-        renderer = new THREE.WebGLRenderer({ antialias: true });
+        // Create the renderer with transparent background
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha: true enables transparency
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);  // Transparent background
         document.body.appendChild(renderer.domElement);
 
-        // Set the clear color of the renderer to white
-        renderer.setClearColor(0xffffff, 1);
+        // Set up camera with dynamic near and far planes
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
         controls = new OrbitControls(camera, renderer.domElement);
@@ -79,15 +58,14 @@
         // Load the GLB model from GitHub Pages
         loader.load('https://karlmsimmons.github.io/3DMODELS/assets/rose.glb', function(gltf) {
             model = gltf.scene;
-            model.position.set(0, 0, 0); // Ensure it's at the center of the scene
-            model.scale.set(1, 1, 1); // Make sure the model is not scaled unexpectedly
+            model.position.set(0, 0, 0); // Center the model
             scene.add(model);
 
-            // Calculate the model's bounding box after it's added to the scene
+            // Calculate the model's bounding box and adjust the camera
             boundingBox.setFromObject(model);
             size.copy(boundingBox.getSize(new THREE.Vector3()));
 
-            // After loading the model, adjust the camera to fit it into the viewer
+            // Adjust the camera near and far planes dynamically based on model size
             adjustCameraToFitModel();
 
             // Start the rendering loop after the model is loaded
@@ -112,34 +90,15 @@
             camera.updateProjectionMatrix();
         });
 
-        // Add event listener to receive messages from the parent window (iframe control)
-        window.addEventListener('message', function(event) {
-            if (event.data === 'centerModel') {
-                // Trigger model centering when the parent sends the message
-                centerModel();
-            }
-        });
-
-        // Function to re-center the model and adjust the camera to fit the model in the viewer
-        function centerModel() {
-            // Re-calculate the bounding box in case the model was moved
-            boundingBox.setFromObject(model);
-            size.copy(boundingBox.getSize(new THREE.Vector3()));
-
-            // Re-adjust camera based on the model size
-            adjustCameraToFitModel();
-        }
-
-        // Function to adjust the camera so that the model fills the window
+        // Adjust camera's near and far planes dynamically based on model size
         function adjustCameraToFitModel() {
-            // Calculate the required distance for the camera to ensure the model fits in the viewport
-            var distance = Math.max(size.x, size.y, size.z);
+            var distance = Math.max(size.x, size.y, size.z); // Get largest model dimension
             var fov = camera.fov * (Math.PI / 180);  // Convert fov to radians
-            var cameraZ = Math.abs(distance / (2 * Math.tan(fov / 2))) * 1.5; // Set the camera distance
+            var cameraZ = Math.abs(distance / (2 * Math.tan(fov / 2))) * 1.5; // Set camera distance to fit model in view
             camera.position.z = cameraZ;
 
-            // Adjust the camera's near and far planes
-            camera.near = cameraZ / 2;
+            // Dynamically adjust the near and far planes to ensure no clipping
+            camera.near = cameraZ / 10;
             camera.far = cameraZ * 2;
             camera.updateProjectionMatrix();
 
@@ -149,6 +108,5 @@
 
         render();
     </script>
-
 </body>
 </html>
