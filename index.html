@@ -8,7 +8,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: white; /* Set the background color to white */
+            background-color: white; /* Ensure the page has a white background */
         }
         canvas {
             display: block;
@@ -27,29 +27,32 @@
         // Initialize the scene
         scene = new THREE.Scene();
 
-        // Add a camera with a good initial distance
+        // Set up camera (make sure it's in a good position to view the model)
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1, 5); // Set camera in a good initial position
+        camera.position.set(0, 1, 5);
 
         // Create the renderer
         renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add OrbitControls for user interaction (rotation, zoom, pan)
+        // Set the clear color of the renderer to white to ensure the background is white
+        renderer.setClearColor(0xffffff, 1);  // white background
+
+        // Add OrbitControls to allow interaction with the 3D model
         controls = new OrbitControls(camera, renderer.domElement);
 
-        // Add a "photobooth" lighting setup (soft and even lighting)
-        var keyLight = new THREE.DirectionalLight(0xffffff, 1);
-        keyLight.position.set(5, 5, 5); // Positioned for a soft, dramatic light
+        // Lighting Setup (photobooth-style lighting)
+        var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);  // Strong key light
+        keyLight.position.set(5, 5, 5);  // Position it at an angle
         scene.add(keyLight);
 
-        var fillLight = new THREE.DirectionalLight(0xffffff, 0.6); // Fill light to soften shadows
-        fillLight.position.set(-5, -5, -5);
+        var fillLight = new THREE.DirectionalLight(0xffffff, 0.5);  // Fill light to soften shadows
+        fillLight.position.set(-5, -5, -5);  // Position it opposite to the key light
         scene.add(fillLight);
 
-        var backLight = new THREE.DirectionalLight(0xffffff, 0.2); // Backlight for additional contrast
-        backLight.position.set(0, 5, -5);
+        var backLight = new THREE.DirectionalLight(0xffffff, 0.3);  // Back light for extra contrast
+        backLight.position.set(0, 5, -5);  // Position it behind the model
         scene.add(backLight);
 
         // Load the GLB model from GitHub Pages
