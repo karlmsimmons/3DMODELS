@@ -36,7 +36,7 @@
         document.body.appendChild(renderer.domElement);
 
         // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 10000);  // Adjust near and far clipping planes
         camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -98,8 +98,8 @@
             camera.position.z = cameraZ;
 
             // Dynamically adjust the near and far planes to ensure no clipping
-            camera.near = cameraZ / 10;
-            camera.far = cameraZ * 2;
+            camera.near = 0.001;  // Near clipping plane set to 1mm (0.001m)
+            camera.far = 10000;   // Far clipping plane set to 10 meters (10000)
             camera.updateProjectionMatrix();
 
             camera.lookAt(0, 0, 0); // Ensure the camera is looking at the center of the model
