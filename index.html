@@ -13,7 +13,26 @@
         canvas {
             display: block;
         }
+        /* Button Styles */
+        #centerButton {
+            position: absolute;
+            bottom: 20px; /* Position it at the bottom */
+            right: 20px; /* Position it at the right */
+            padding: 10px 20px;
+            background-color: black;
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        #centerButton:hover {
+            background-color: #333;
+        }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet"> <!-- Load IBM Plex Mono font -->
 </head>
 <body>
     <script type="module">
@@ -23,6 +42,7 @@
 
         var scene, camera, renderer, controls;
         var loader = new GLTFLoader();
+        var model; // To store the loaded model
 
         // Initialize the scene
         scene = new THREE.Scene();
@@ -37,31 +57,29 @@
         document.body.appendChild(renderer.domElement);
 
         // Set the clear color of the renderer to white to ensure the background is white
-        renderer.setClearColor(0xffffff, 1);  // white background
+        renderer.setClearColor(0xffffff, 1);
 
         // Add OrbitControls to allow interaction with the 3D model
         controls = new OrbitControls(camera, renderer.domElement);
 
-        // Lighting Setup (photobooth-style lighting)
-        var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);  // Strong key light
-        keyLight.position.set(5, 5, 5);  // Position it at an angle
+        // Add "photobooth-style" lighting
+        var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        keyLight.position.set(5, 5, 5);
         scene.add(keyLight);
 
-        var fillLight = new THREE.DirectionalLight(0xffffff, 0.5);  // Fill light to soften shadows
-        fillLight.position.set(-5, -5, -5);  // Position it opposite to the key light
+        var fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        fillLight.position.set(-5, -5, -5);
         scene.add(fillLight);
 
-        var backLight = new THREE.DirectionalLight(0xffffff, 0.3);  // Back light for extra contrast
-        backLight.position.set(0, 5, -5);  // Position it behind the model
+        var backLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        backLight.position.set(0, 5, -5);
         scene.add(backLight);
 
         // Load the GLB model from GitHub Pages
         loader.load('https://karlmsimmons.github.io/3DMODELS/assets/rose.glb', function(gltf) {
-            // Center the model by adjusting its position
-            gltf.scene.position.set(0, 0, 0);
-            scene.add(gltf.scene);
-
-            // Start the rendering loop after the model is loaded
+            model = gltf.scene;
+            model.position.set(0, 0, 0);
+            scene.add(model);
             render();
         }, function(xhr) {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -83,7 +101,25 @@
             camera.updateProjectionMatrix();
         });
 
+        // Add event listener to the center button
+        document.getElementById("centerButton").addEventListener("click", centerModel);
+
+        // Function to re-center the model in the window
+        function centerModel() {
+            // Reset camera position
+            camera.position.set(0, 1, 5);
+            camera.lookAt(0, 0, 0);
+            controls.update();
+
+            // Optionally, adjust the camera's field of view or other settings if you want the model to fill the window more
+            controls.reset();
+        }
+
         render();
     </script>
+
+    <!-- Center Button at the bottom right -->
+    <button id="centerButton">Center Model</button>
+
 </body>
 </html>
