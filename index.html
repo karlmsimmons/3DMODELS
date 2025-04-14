@@ -16,14 +16,14 @@
     </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Import GLTFLoader as a separate module -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script>
+    <!-- Load Three.js as a module -->
+    <script type="module">
+        import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js";
+        import { GLTFLoader } from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js";
+        import { OrbitControls } from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.js";
 
-    <script>
         var scene, camera, renderer, controls;
-        var loader = new THREE.GLTFLoader(); // Now works with the updated import
+        var loader = new GLTFLoader();
 
         // Initialize the scene
         scene = new THREE.Scene();
@@ -38,7 +38,7 @@
         document.body.appendChild(renderer.domElement);
 
         // Add OrbitControls for user interaction (rotation, zoom, pan)
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls = new OrbitControls(camera, renderer.domElement);
 
         // Add a default light to illuminate the scene
         var ambientLight = new THREE.AmbientLight(0x404040); // Soft light
