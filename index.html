@@ -105,9 +105,12 @@
         }
 
         // Resize handling for responsive design
-        window.addEventListener('resize', function() {
+        const resizeObserver = new ResizeObserver(() => {
             resizeIframe();
         });
+
+        // Observe the iframe size and adjust accordingly
+        resizeObserver.observe(document.body);
 
         // Resize function: Dynamically adjust the renderer size and camera
         function resizeIframe() {
@@ -116,7 +119,7 @@
             const iframeHeight = iframe.clientHeight;
 
             renderer.setSize(iframeWidth, iframeHeight);  // Adjust renderer size based on iframe size
-            camera.aspect = iframeWidth / iframeHeight;  // Adjust camera aspect ratio based on new iframe size
+            camera.aspect = iframeWidth / iframeHeight;  // Adjust camera aspect ratio accordingly
             camera.updateProjectionMatrix();  // Update camera projection
         }
 
@@ -152,6 +155,11 @@
 
         // Call resizeIframe initially to adjust to the initial iframe size
         resizeIframe();
+
+        // Send message to the parent when the "Center Model" button is clicked
+        document.getElementById('centerButton').addEventListener('click', function() {
+            window.parent.postMessage('centerModel', '*');
+        });
 
         render();
     </script>
