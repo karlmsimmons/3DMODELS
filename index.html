@@ -54,12 +54,10 @@
 
         // Create the renderer with transparent background
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha: true enables transparency
-        renderer.setSize(300, 4200); // Set fixed size of 400x300
-        renderer.setClearColor(0x000000, 0);  // Transparent background
         document.body.appendChild(renderer.domElement);
 
         // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, 300 / 420, 0.001, 10000);  // Adjust near and far clipping planes
+        camera = new THREE.PerspectiveCamera(75, 1, 0.001, 10000);  // Aspect ratio will be updated dynamically
         camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -108,10 +106,19 @@
 
         // Resize handling for responsive design
         window.addEventListener('resize', function() {
-            renderer.setSize(300, 420);
-            camera.aspect = 300 / 420;
-            camera.updateProjectionMatrix();
+            resizeIframe();
         });
+
+        // Resize function: Dynamically adjust the renderer size and camera
+        function resizeIframe() {
+            const iframe = document.body;  // Get the body of the iframe
+            const iframeWidth = iframe.clientWidth;
+            const iframeHeight = iframe.clientHeight;
+
+            renderer.setSize(iframeWidth, iframeHeight);  // Adjust renderer size based on iframe size
+            camera.aspect = iframeWidth / iframeHeight;  // Adjust camera aspect ratio based on new iframe size
+            camera.updateProjectionMatrix();  // Update camera projection
+        }
 
         // Adjust camera's near and far planes dynamically based on model size
         function adjustCameraToFitModel() {
@@ -142,6 +149,9 @@
             size.copy(boundingBox.getSize(new THREE.Vector3()));
             adjustCameraToFitModel();
         }
+
+        // Call resizeIframe initially to adjust to the initial iframe size
+        resizeIframe();
 
         render();
     </script>
