@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Model Viewer</title>
+    <title>Embed 3D Model Viewer</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
+        /* Make the iframe container with fixed width and height */
+        .iframe-container {
+            position: relative;
+            width: 400px;  /* Set fixed width */
+            height: 300px; /* Set fixed height */
+            margin: 0 auto; /* Center the iframe */
+            border: 5px solid black; /* Black border */
+            border-radius: 25px; /* Rounded corners */
+            overflow: hidden; /* Ensure iframe and button stay within container */
         }
-        canvas {
-            display: block;
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
+
+        /* Center the button at the bottom of the iframe */
         #centerButton {
             position: absolute;
             bottom: 5%; /* 5% from the bottom of the iframe container */
-            right: 5%;  /* 5% from the right of the iframe container */
-            padding: 1vh 2vw; /* Make button size responsive */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for exact centering */
+            width: 80px; /* Set fixed width */
+            height: 20px; /* Set fixed height */
             background-color: black;
             color: white;
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 2vw; /* Make the button font size responsive */
+            font-size: 12px; /* Adjust font size to fit the button */
+            font-weight: bold; /* Make the text bold */
+            text-align: center; /* Center the text horizontally */
+            line-height: 20px; /* Center the text vertically */
             border: none;
             border-radius: 25px;
             cursor: pointer;
@@ -33,112 +49,44 @@
     </style>
 </head>
 <body>
-    <script type="module">
-        import * as THREE from "https://cdn.skypack.dev/three@0.128.0";
-        import { GLTFLoader } from "https://cdn.skypack.dev/three@0.128.0/examples/jsm/loaders/GLTFLoader.js";
-        import { OrbitControls } from "https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js";
+    <div class="iframe-container">
+        <iframe 
+            id="modelViewerIframe"
+            src="https://karlmsimmons.github.io/3DMODELS/" 
+            title="3D Model Viewer"
+            allowfullscreen>
+        </iframe>
+        <!-- Center Model Button in the bottom of the iframe -->
+        <button id="centerButton" onclick="centerModel()">Center Model</button>
+    </div>
 
-        var scene, camera, renderer, controls;
-        var loader = new GLTFLoader();
-        var model;
-        var boundingBox = new THREE.Box3();
-        var size = new THREE.Vector3();
-
-        // Initialize the scene
-        scene = new THREE.Scene();
-
-        // Create the renderer with transparent background
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha: true enables transparency
-        renderer.setSize(400, 300); // Set fixed size of 400x300
-        renderer.setClearColor(0x000000, 0);  // Transparent background
-        document.body.appendChild(renderer.domElement);
-
-        // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.001, 10000);  // Adjust near and far clipping planes
-        camera.position.set(0, 1, 5);
-
-        // Add OrbitControls to allow interaction with the 3D model
-        controls = new OrbitControls(camera, renderer.domElement);
-
-        // Add lighting to the scene
-        var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        keyLight.position.set(5, 5, 5);
-        scene.add(keyLight);
-
-        var fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        fillLight.position.set(-5, -5, -5);
-        scene.add(fillLight);
-
-        var backLight = new THREE.DirectionalLight(0xffffff, 0.3);
-        backLight.position.set(0, 5, -5);
-        scene.add(backLight);
-
-        // Load the GLB model from GitHub Pages
-        loader.load('https://karlmsimmons.github.io/3DMODELS/assets/rose.glb', function(gltf) {
-            model = gltf.scene;
-            model.position.set(0, 0, 0); // Center the model
-            scene.add(model);
-
-            // Calculate the model's bounding box and adjust the camera
-            boundingBox.setFromObject(model);
-            size.copy(boundingBox.getSize(new THREE.Vector3()));
-
-            // Adjust the camera near and far planes dynamically based on model size
-            adjustCameraToFitModel();
-
-            // Start the rendering loop after the model is loaded
-            render();
-        }, function(xhr) {
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-        }, function(error) {
-            console.error('Error loading the GLB model:', error);
-        });
-
-        // Render loop
-        function render() {
-            requestAnimationFrame(render);
-            controls.update(); // Enable interaction
-            renderer.render(scene, camera);
+    <script>
+        // Function to send a message to the iframe to center the model
+        function centerModel() {
+            var iframe = document.getElementById('modelViewerIframe');
+            // Send a message to the iframe to center the model
+            iframe.contentWindow.postMessage('centerModel', '*');
         }
 
-        // Resize handling for responsive design
-        window.addEventListener('resize', function() {
-            renderer.setSize(400, 300);
-            camera.aspect = 400 / 300;
-            camera.updateProjectionMatrix();
-        });
-
-        // Adjust camera's near and far planes dynamically based on model size
-        function adjustCameraToFitModel() {
-            var distance = Math.max(size.x, size.y, size.z); // Get largest model dimension
-            var fov = camera.fov * (Math.PI / 180);  // Convert fov to radians
-            var cameraZ = Math.abs(distance / (2 * Math.tan(fov / 2))) * 1.5; // Set camera distance to fit model in view
-            camera.position.z = cameraZ;
-
-            // Dynamically adjust the near and far planes to ensure no clipping
-            camera.near = 0.001;  // Near clipping plane set to 1mm (0.001m)
-            camera.far = 10000;   // Far clipping plane set to 10 meters (10000)
-            camera.updateProjectionMatrix();
-
-            camera.lookAt(0, 0, 0); // Ensure the camera is looking at the center of the model
-            controls.update();
-        }
-
-        // Send message to parent window when the button is clicked (iframe sends 'centerModel' message)
+        // Listen for messages from the iframe (to center the model)
         window.addEventListener('message', function(event) {
+            if (event.origin !== 'https://karlmsimmons.github.io') {
+                return; // Ignore messages from unknown sources
+            }
+
             if (event.data === 'centerModel') {
-                centerModel();
+                // Trigger centering of the model on the parent window
+                console.log('Centering model from iframe');
+                centerModelInParent(); // Call function to center the model in the parent viewer
             }
         });
 
-        // Function to center the model
-        function centerModel() {
-            boundingBox.setFromObject(model);
-            size.copy(boundingBox.getSize(new THREE.Vector3()));
-            adjustCameraToFitModel();
+        // Function to center the model in the parent window
+        function centerModelInParent() {
+            // Get the 3D model iframe's viewer and adjust the camera to fit the model
+            const iframe = document.getElementById('modelViewerIframe').contentWindow;
+            iframe.postMessage('centerModel', '*'); // Send a message to the iframe to update its view
         }
-
-        render();
     </script>
 </body>
 </html>
