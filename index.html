@@ -54,12 +54,12 @@
 
         // Create the renderer with transparent background
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha: true enables transparency
-        renderer.setSize(400, 300); // Set fixed size of 400x300
+        renderer.setSize(300, 4200); // Set fixed size of 400x300
         renderer.setClearColor(0x000000, 0);  // Transparent background
         document.body.appendChild(renderer.domElement);
 
         // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.001, 10000);  // Adjust near and far clipping planes
+        camera = new THREE.PerspectiveCamera(75, 300 / 420, 0.001, 10000);  // Adjust near and far clipping planes
         camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -108,8 +108,8 @@
 
         // Resize handling for responsive design
         window.addEventListener('resize', function() {
-            renderer.setSize(400, 300);
-            camera.aspect = 400 / 300;
+            renderer.setSize(300, 420);
+            camera.aspect = 300 / 420;
             camera.updateProjectionMatrix();
         });
 
