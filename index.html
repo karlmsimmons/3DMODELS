@@ -142,7 +142,7 @@
             controls.update();
         }
 
-        // Send message to parent window when the button is clicked (iframe sends 'centerModel' message)
+        // Listen for messages from the iframe (to center the model)
         window.addEventListener('message', function(event) {
             if (event.data === 'centerModel') {
                 centerModel();
