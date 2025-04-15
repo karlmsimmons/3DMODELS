@@ -122,8 +122,8 @@
             const iframeHeight = iframe.clientHeight;
 
             renderer.setSize(iframeWidth, iframeHeight);  // Adjust renderer size based on iframe size
-            camera.aspect = iframeWidth / iframeHeight;  // Adjust camera aspect ratio accordingly
-            camera.updateProjectionMatrix();  // Update camera projection
+            camera.aspect = iframeWidth / iframeHeight;  // Adjust camera aspect ratio to match iframe aspect ratio
+            camera.updateProjectionMatrix();  // Update camera projection matrix based on the new aspect ratio
         }
 
         // Adjust camera's near and far planes dynamically based on model size
