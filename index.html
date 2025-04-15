@@ -62,7 +62,7 @@
         document.body.appendChild(renderer.domElement);
 
         // Set up camera with dynamic near and far planes
-        camera = new THREE.PerspectiveCamera(75, 300 / 420, 0.001, 10000);  // Fixed aspect ratio to match 300px by 420px
+        camera = new THREE.PerspectiveCamera(75, 300 / 300, 0.001, 10000);  // Fixed aspect ratio to match 300px by 300px
         camera.position.set(0, 1, 5);
 
         // Add OrbitControls to allow interaction with the 3D model
@@ -170,6 +170,4 @@
     </script>
 
     <!-- Center Model Button -->
-    <button id="centerButton">Center Model</button>
-</body>
-</html>
+    <button id
